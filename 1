@@ -4,13 +4,21 @@ const int ledAutomatico = 8;
 const int ledManual = 7;
 const int but1 = 9; //avanzar modo
 const int but2 = 10; //regresar modo
+const int but3 = 11; //Boton de seleccion de modos
 int potenciometro1 = 3;
 int potenciometro2 = 2;
 int potenciometro3 = 1;
 int potenciometro4 = 0;
 
-int val = 0;
-int valor = 0;
+int val1 = 0;
+int val2 = 0;
+int val3 = 0;
+int val4 = 0;
+int valor1 = 0;
+int valor2 = 0;
+int valor3 = 0;
+int valor4 = 0;
+int contador = 0;
 int estadoActual;  //Registro de estado en el que se encuenta la maquina
 int estadoFuturo;  //Registro de estado futuro
 
@@ -21,7 +29,9 @@ typedef enum Estados {
   s3,
   s4,
   s5,
-  s6
+  s6,
+  ModoAutomatico,
+  ModoManual
 };
 
 Servo servo1; //base
@@ -48,24 +58,118 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+//Contador para cambio en modo automatico
+if(contador < 5){
+  if(digitalRead(but1) == HIGH){
+    contador++;}
+  delay(100); 
+}
+
+if (contador > 0){
+  if (digitalRead(but2)){
+    contador--;
+  } 
+  delay(100);
+}
+
+//Seleccion de modos
+  bool leerAvanzar = digitalRead(but1);
+  bool leerRetroceder = digitalRead(but2);
+  bool leerModo = digitalRead(but3);
+
    switch (estadoActual) {
+    //Modo 
+    if (leerModo == HIGH){
+      case ModoManual:
+      estadoActual = ModoManual;
+      digitalWrite(ledManual, HIGH);
+//Modo manual
+//Movimiento de servo1 conforme el pot1 se va girando
+      val1 = analogRead(potenciometro1);
+      valor1 = map(val1, 0, 1023, 0, 180);
+      servo1.write(valor1);
+
+//Movimiento de servo2 conforme pot2 se va girando
+      val2 = analogRead(potenciometro2);
+      valor2 = map(val2, 0, 1023, 0, 180);
+      servo2.write(valor2);
+  
+//Movimiento de servo3 conforme pot3 se va girando
+      val3 = analogRead(potenciometro3);
+      valor3 = map(val3, 0, 1023, 0, 180);
+      servo3.write(valor3);
+  
+//Movimiento de servo4 conforme pot4 se va girando
+      val4 = analogRead(potenciometro4);
+      valor4 = map(val4, 0, 1023, 0, 180);
+      servo4.write(valor4); 
+    }
+    break;
+   
     case s0:
+    if (leerAvanzar == 0){
+    estadoActual = s0;
     servo1.write(0);
     servo2.write(0);
     servo3.write(0);
     servo4.write(0);
-    
-    case s1:  
-    if (but1 == HIGH){
-      estadoActual = s1;
-      servo1.write(90);
-      servo2.write(45);
-      servo3.write(45);
-      servo4.write(20);
+    digitalWrite(ledAutomatico, HIGH);
     }
     break;
-   }
-  
-}
+    
+    case s1:  
+    if (leerAvanzar == 1){
+      estadoActual = s1;
+      servo1.write(50);
+      servo2.write(50);
+      servo3.write(50);
+      servo4.write(50);
+      digitalWrite(ledAutomatico, HIGH);
+    }
+    break;
 
+     case s2:  
+    if (leerAvanzar == 2){
+      estadoActual = s2;
+      servo1.write(80);
+      servo2.write(80);
+      servo3.write(80);
+      servo4.write(80);
+      digitalWrite(ledAutomatico, HIGH);
+      }
+    break;
+
+     case s3:  
+    if (leerAvanzar == 3){
+      estadoActual = s3;
+      servo1.write(30);
+      servo2.write(30);
+      servo3.write(30);
+      servo4.write(30);
+      digitalWrite(ledAutomatico, HIGH);
+      }
+    break;
+
+       case s4:  
+    if (leerAvanzar == 4){
+      estadoActual = s4;
+      servo1.write(90);
+      servo2.write(90);
+      servo3.write(90);
+      servo4.write(90);
+      digitalWrite(ledAutomatico, HIGH);
+      }
+    break;
+
+       case s5:  
+    if (leerAvanzar == 5){
+      estadoActual = s5;
+      servo1.write(15);
+      servo2.write(15);
+      servo3.write(15);
+      servo4.write(15);
+      digitalWrite(ledAutomatico, HIGH);
+      }
+    break;
+   }
+}
