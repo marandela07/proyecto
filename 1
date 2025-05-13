@@ -44,8 +44,9 @@ void setup() {
   Serial.begin(9600); 
   pinMode (ledAutomatico, OUTPUT);
   pinMode (ledManual, OUTPUT);
-  pinMode (but1, INPUT);
-  pinMode (but2, INPUT);
+  pinMode (but1, INPUT_PULLUP);
+  pinMode (but2, INPUT_PULLUP);
+  pinMode (but3, INPUT_PULLUP);
   pinMode (potenciometro1, INPUT);
   pinMode (potenciometro2, INPUT);
   pinMode (potenciometro3, INPUT);
@@ -58,54 +59,50 @@ void setup() {
 }
 
 void loop() {
-//Contador para cambio en modo automatico
-if(contador < 5){
-  if(digitalRead(but1) == HIGH){
-    contador++;}
-  delay(100); 
-}
-
-if (contador > 0){
-  if (digitalRead(but2)){
-    contador--;
-  } 
-  delay(100);
-}
-
-//Seleccion de modos
-  bool leerAvanzar = digitalRead(but1);
-  bool leerRetroceder = digitalRead(but2);
-  bool leerModo = digitalRead(but3);
-
-   switch (estadoActual) {
-    //Modo 
-    if (leerModo == HIGH){
-      case ModoManual:
-      estadoActual = ModoManual;
-      digitalWrite(ledManual, HIGH);
 //Modo manual
 //Movimiento de servo1 conforme el pot1 se va girando
       val1 = analogRead(potenciometro1);
       valor1 = map(val1, 0, 1023, 0, 180);
       servo1.write(valor1);
+      digitalWrite(ledManual, HIGH);
 
 //Movimiento de servo2 conforme pot2 se va girando
       val2 = analogRead(potenciometro2);
       valor2 = map(val2, 0, 1023, 0, 180);
       servo2.write(valor2);
+      digitalWrite(ledManual, HIGH);
   
 //Movimiento de servo3 conforme pot3 se va girando
       val3 = analogRead(potenciometro3);
       valor3 = map(val3, 0, 1023, 0, 180);
       servo3.write(valor3);
+      digitalWrite(ledManual, HIGH);
   
 //Movimiento de servo4 conforme pot4 se va girando
       val4 = analogRead(potenciometro4);
       valor4 = map(val4, 0, 1023, 0, 180);
       servo4.write(valor4); 
-    }
-    break;
-   
+      digitalWrite(ledManual, HIGH);
+
+//Contador para cambio en modo automatico
+  if (contador < 5){ 
+    if (digitalRead(but1) == HIGH) { 
+    delay (75); 
+    if (digitalRead(but1) == HIGH) { 
+      contador++; }  }}
+
+  if (contador > 0){ 
+    if (digitalRead(but2) == HIGH) { 
+    delay (75); 
+      if (digitalRead(but2) == HIGH) { 
+      contador--; }   }}
+
+//Seleccion de modos
+  bool leerAvanzar = digitalRead(but1);
+  bool leerRetroceder = digitalRead(but2);
+  bool leerModo = digitalRead(but3);
+ 
+  switch (estadoActual) {   
     case s0:
     if (leerAvanzar == 0){
     estadoActual = s0;
@@ -171,5 +168,5 @@ if (contador > 0){
       digitalWrite(ledAutomatico, HIGH);
       }
     break;
-   }
+  }
 }
