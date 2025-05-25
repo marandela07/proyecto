@@ -1,126 +1,173 @@
 #include <Servo.h>
 
-// Pines
 const int ledAutomatico = 4;
 const int ledManual = 5;
-const int butAvanzar = 7;
-const int butRegresar = 8;
-const int butCambio = 6;
-int potenciometro1 = A0;
-int potenciometro2 = A1;
-int potenciometro3 = A2;
-int potenciometro4 = A3;
+const int butAvanzar = 7; //avanzar modo
+const int butRegresar = 8; //regresar modo
+const int butCambio = 6; //Boton de seleccion de modos
+int potenciometro1 = A0; //Base
+int potenciometro2 = A1; //Garra derecha
+int potenciometro3 = A2; //Garra izquierda
+int potenciometro4 = A3; // Garrita
 
-// Variables
+int val1 = 0;
+int val2 = 0;
+int val3 = 0;
+int val4 = 0;
+int valor1 = 0;
+int valor2 = 0;
+int valor3 = 0;
+int valor4 = 0;
 int valor = 0;
-bool cambioPresionado = false;
 
-Servo servo1, servo2, servo3, servo4;
+enum Estados {
+  s0, 
+  s1,
+  s2,
+  s3,
+  s4,
+  s5
+};
+Estados estadoActual = s0;
 
-// Modo de operación
-enum Modo { ModoAutomatico, ModoManual };
+enum Modo { 
+  ModoAutomatico,
+  ModoManual};
 Modo modoActual = ModoManual;
 
-// Estados anteriores para flanco
-bool estadoAnteriorCambio = LOW;
-bool estadoAnteriorAvanzar = LOW;
-bool estadoAnteriorRegresar = LOW;
+Servo servo1; //base
+Servo servo2; //brazo izquierdo
+Servo servo3; // brazo derecho 
+Servo servo4; // garra  
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(9600); 
 
-  pinMode(ledAutomatico, OUTPUT);
-  pinMode(ledManual, OUTPUT);
-  pinMode(butAvanzar, INPUT);
-  pinMode(butRegresar, INPUT);
-  pinMode(butCambio, INPUT);
+//Configurar pines
+  pinMode (ledAutomatico, OUTPUT);
+  pinMode (ledManual, OUTPUT);
+  pinMode (butAvanzar, INPUT);
+  pinMode (butRegresar, INPUT);
+  pinMode (butCambio, INPUT);
+  pinMode (potenciometro1, INPUT);
+  pinMode (potenciometro2, INPUT);
+  pinMode (potenciometro3, INPUT);
+  pinMode (potenciometro4, INPUT);
 
-  pinMode(potenciometro1, INPUT);
-  pinMode(potenciometro2, INPUT);
-  pinMode(potenciometro3, INPUT);
-  pinMode(potenciometro4, INPUT);
-
+//Configurar servos
   servo1.attach(12);
   servo2.attach(11);
   servo3.attach(10);
   servo4.attach(9);
 }
 
-void controlManual() {
-  digitalWrite(ledManual, HIGH);
-  digitalWrite(ledAutomatico, LOW);
+ void controlManual (){
+//Movimiento de servo1 conforme el pot1 se va girando
+    val1 = analogRead(potenciometro1);
+    valor1 = map(val1, 0, 1023, 0, 180);
+    servo1.write(valor1);
+    digitalWrite(ledManual, HIGH);
 
-  int val1 = analogRead(potenciometro1);
-  int val2 = analogRead(potenciometro2);
-  int val3 = analogRead(potenciometro3);
-  int val4 = analogRead(potenciometro4);
+//Movimiento de servo2 conforme pot2 se va girando
+    val2 = analogRead(potenciometro2);
+    valor2 = map(val2, 0, 1023, 0, 180);
+    servo2.write(valor2);
+    digitalWrite(ledManual, HIGH);
+  
+//Movimiento de servo3 conforme pot3 se va girando
+    val3 = analogRead(potenciometro3);
+    valor3 = map(val3, 0, 1023, 0, 180);
+    servo3.write(valor3);
+    digitalWrite(ledManual, HIGH);
+  
+//Movimiento de servo4 conforme pot4 se va girando
+    val4 = analogRead(potenciometro4);
+    valor4 = map(val4, 0, 1023, 0, 180);
+    servo4.write(valor4); 
+    digitalWrite(ledManual, HIGH);
+ }
 
-  servo1.write(map(val1, 0, 1023, 0, 180));
-  servo2.write(map(val2, 0, 1023, 0, 180));
-  servo3.write(map(val3, 0, 1023, 0, 180));
-  servo4.write(map(val4, 0, 1023, 0, 180));
-}
-
-void ejecutarEstadoAuto() {
+ void modoAutomatico (){
+  //Contador de estados
+  int regresar = digitalRead(butRegresar);
+  int avanzar = digitalRead(butAvanzar);
+  if (avanzar == HIGH){
+    valor ++;}
+  if (regresar == HIGH){
+    valor = 0;}
+  if (valor > 5){
+    valor = 0;
   digitalWrite(ledManual, LOW);
   digitalWrite(ledAutomatico, HIGH);
 
-  switch(valor) {
-    case 0:
-      servo1.write(0); servo2.write(20); servo3.write(30); servo4.write(0);
-      break;
+  switch(estadoActual) {
+    case s0: 
+    if (butCambio == HIGH && valor == 0){estadoActual = s1;
+    servo1.write(0);
+    servo2.write(0);
+    servo3.write(0);
+    servo4.write(0);
+    }
+    break; 
+    if (butCambio == HIGH && valor == 1){estadoActual = s2;
     case 1:
-      servo1.write(45); servo2.write(25); servo3.write(35); servo4.write(45);
-      break;
-    case 2:
-      servo1.write(90); servo2.write(20); servo3.write(20); servo4.write(90);
-      break;
-    case 3:
-      servo1.write(135); servo2.write(15); servo3.write(25); servo4.write(135);
-      break;
+    servo1.write(50);
+    servo2.write(50);
+    servo3.write(50);
+    servo4.write(50);
+    }
+    break; 
+    if (butCambio == HIGH && valor == 2){estadoActual = s3;
+    case 2: 
+    servo1.write(80);
+    servo2.write(80);
+    servo3.write(80);
+    servo4.write(80);
+    }
+    break; 
+    if (butCambio == HIGH && valor == 3){estadoActual = s4;
+    case 3: 
+    servo1.write(3);
+    servo2.write(30);
+    servo3.write(30);
+    servo4.write(30);
+    }
+    break; 
+    if (butCambio == HIGH && valor == 4){estadoActual = s5;
     case 4:
-      servo1.write(180); servo2.write(40); servo3.write(25); servo4.write(180);
-      break;
-    case 5:
-      servo1.write(90); servo2.write(25); servo3.write(35); servo4.write(90);
-      break;
+    servo1.write(90);
+    servo2.write(90);
+    servo3.write(90);
+    servo4.write(90);
+    }
+    break;
+    if (butCambio == HIGH && valor == 5){estadoActual = s0; 
+    case 5: 
+    servo1.write(15);
+    servo2.write(15);
+    servo3.write(15);
+    servo4.write(15);
+    }
+    break; 
+    }
   }
 }
 
-void loop() {
-  // Lectura de botones
-  bool estadoCambio = digitalRead(butCambio);
-  bool estadoAvanzar = digitalRead(butAvanzar);
-  bool estadoRegresar = digitalRead(butRegresar);
-
-  // Detectar flanco de subida en botón cambio
-  if (estadoCambio == HIGH && estadoAnteriorCambio == LOW) {
-    modoActual = (modoActual == ModoManual) ? ModoAutomatico : ModoManual;
-    delay(200); // anti-rebote
+ void loop() {
+  // Verificar cambio de modo
+  if (digitalRead(butCambio) == HIGH) {
+    if (modoActual == ModoManual) {
+      modoActual = ModoAutomatico;
+    } else {
+      modoActual = ModoManual;
+      controlManual();
+    }
   }
-  estadoAnteriorCambio = estadoCambio;
 
-  // Ejecutar lógica según modo
-  if (modoActual == ModoManual) {
-    controlManual();
+  // Ejecutar el modo actual
+  if (modoActual == ModoAutomatico) {
+    modoAutomatico();
   } else {
-    // Detectar flanco de subida para avanzar
-    if (estadoAvanzar == HIGH && estadoAnteriorAvanzar == LOW) {
-      valor++;
-      if (valor > 5) valor = 0;
-      ejecutarEstadoAuto();
-      delay(200);
-    }
-
-    // Detectar flanco de subida para regresar
-    if (estadoRegresar == HIGH && estadoAnteriorRegresar == LOW) {
-      valor--;
-      if (valor < 0) valor = 5;
-      ejecutarEstadoAuto();
-      delay(200);
-    }
-
-    estadoAnteriorAvanzar = estadoAvanzar;
-    estadoAnteriorRegresar = estadoRegresar;
+    controlManual();
   }
 }
