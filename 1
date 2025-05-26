@@ -31,9 +31,9 @@ enum Estados {
 Estados estadoActual = s0;
 
 enum Modo { 
-  ModoAutomatico,
-  ModoManual};
-Modo modoActual = ModoManual;
+  modoAutomatico,
+  modoManual};
+Modo modoActual = modoManual;
 
 Servo servo1; //base
 Servo servo2; //brazo izquierdo
@@ -48,7 +48,7 @@ void setup() {
   pinMode (ledManual, OUTPUT);
   pinMode (butAvanzar, INPUT);
   pinMode (butRegresar, INPUT);
-  pinMode (butCambio, INPUT);
+  pinMode (butCambio, INPUT_PULLUP);
   pinMode (potenciometro1, INPUT);
   pinMode (potenciometro2, INPUT);
   pinMode (potenciometro3, INPUT);
@@ -61,42 +61,48 @@ void setup() {
   servo4.attach(9);
 }
 
- void controlManual (){
+ void ModoManual (){
 //Movimiento de servo1 conforme el pot1 se va girando
     val1 = analogRead(potenciometro1);
     valor1 = map(val1, 0, 1023, 0, 180);
     servo1.write(valor1);
     digitalWrite(ledManual, HIGH);
+    digitalWrite(ledAutomatico, LOW);
 
 //Movimiento de servo2 conforme pot2 se va girando
     val2 = analogRead(potenciometro2);
     valor2 = map(val2, 0, 1023, 0, 180);
     servo2.write(valor2);
     digitalWrite(ledManual, HIGH);
+    digitalWrite(ledAutomatico, LOW);
   
 //Movimiento de servo3 conforme pot3 se va girando
     val3 = analogRead(potenciometro3);
     valor3 = map(val3, 0, 1023, 0, 180);
     servo3.write(valor3);
     digitalWrite(ledManual, HIGH);
+    digitalWrite(ledAutomatico, LOW);
   
 //Movimiento de servo4 conforme pot4 se va girando
     val4 = analogRead(potenciometro4);
     valor4 = map(val4, 0, 1023, 0, 180);
     servo4.write(valor4); 
     digitalWrite(ledManual, HIGH);
+    digitalWrite(ledAutomatico, LOW);
  }
 
- void modoAutomatico (){
+ void ModoAutomatico (){
   //Contador de estados
   int regresar = digitalRead(butRegresar);
   int avanzar = digitalRead(butAvanzar);
   if (avanzar == HIGH){
     valor ++;}
   if (regresar == HIGH){
-    valor = 0;}
+    valor --;}
   if (valor > 5){
-    valor = 0;
+    valor = 0;}
+  if (valor < 0){
+    valor = 5;}
   digitalWrite(ledManual, LOW);
   digitalWrite(ledAutomatico, HIGH);
 
@@ -112,62 +118,54 @@ void setup() {
     if (butCambio == HIGH && valor == 1){estadoActual = s2;
     case 1:
     servo1.write(50);
-    servo2.write(50);
-    servo3.write(50);
+    servo2.write(25);
+    servo3.write(30);
     servo4.write(50);
     }
     break; 
     if (butCambio == HIGH && valor == 2){estadoActual = s3;
     case 2: 
     servo1.write(80);
-    servo2.write(80);
-    servo3.write(80);
+    servo2.write(35);
+    servo3.write(20);
     servo4.write(80);
     }
     break; 
     if (butCambio == HIGH && valor == 3){estadoActual = s4;
     case 3: 
-    servo1.write(3);
+    servo1.write(30);
     servo2.write(30);
-    servo3.write(30);
+    servo3.write(40);
     servo4.write(30);
     }
     break; 
     if (butCambio == HIGH && valor == 4){estadoActual = s5;
     case 4:
     servo1.write(90);
-    servo2.write(90);
-    servo3.write(90);
+    servo2.write(45);
+    servo3.write(40);
     servo4.write(90);
     }
     break;
     if (butCambio == HIGH && valor == 5){estadoActual = s0; 
     case 5: 
     servo1.write(15);
-    servo2.write(15);
-    servo3.write(15);
+    servo2.write(25);
+    servo3.write(30);
     servo4.write(15);
     }
     break; 
-    }
   }
 }
 
  void loop() {
   // Verificar cambio de modo
   if (digitalRead(butCambio) == HIGH) {
-    if (modoActual == ModoManual) {
-      modoActual = ModoAutomatico;
+    if (modoActual = modoAutomatico) {
+      ModoAutomatico();
     } else {
-      modoActual = ModoManual;
-      controlManual();
+      modoActual = modoManual;
+      ModoManual();
     }
-  }
-
-  // Ejecutar el modo actual
-  if (modoActual == ModoAutomatico) {
-    modoAutomatico();
-  } else {
-    controlManual();
   }
 }
