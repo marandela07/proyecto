@@ -32,6 +32,10 @@ unsigned long tAvanzar = 0;
 unsigned long tRegresar = 0;
 const unsigned long rebote = 200;
 
+// Variables para mostrar posiciones
+unsigned long ultimoReporte = 0;
+const unsigned long intervaloReporte = 500; // Mostrar cada 500ms
+
 void setup() {
   Serial.begin(9600);
 //Declaracion de entradas y salidas del sistema
@@ -50,6 +54,8 @@ void setup() {
   servo2.attach(11);
   servo3.attach(10);
   servo4.attach(9);
+  
+  mostrarPosiciones(); // Mostrar posiciones iniciales
 }
 //Funcion para el modo manual
 void ModoManual() {
@@ -82,6 +88,7 @@ void ModoAutomatico() {
     tAvanzar = tiempo;
     valor++;
     if (valor > 5) valor = 0;
+    mostrarPosiciones(); // Mostrar posiciones al cambiar estado
   }
 
   //Regresar entre los estados
@@ -89,6 +96,7 @@ void ModoAutomatico() {
     tRegresar = tiempo;
     valor--;
     if (valor < 0) valor = 5;
+    mostrarPosiciones(); // Mostrar posiciones al cambiar estado
   }
 
   // Actualizar estado
@@ -106,6 +114,16 @@ void ModoAutomatico() {
   digitalWrite(ledManual, LOW);
   digitalWrite(ledAutomatico, HIGH);
 }
+
+// Función para mostrar las posiciones actuales
+void mostrarPosiciones() {
+  Serial.print("Posiciones: ");
+  Serial.print("Base = "); Serial.print(servo1.read()); Serial.print("°");
+  Serial.print(", BrazoIzq = "); Serial.print(servo2.read()); Serial.print("°");
+  Serial.print(", BrazoDer = "); Serial.print(servo3.read()); Serial.print("°");
+  Serial.print(", Garra = "); Serial.print(servo4.read()); Serial.println("°");
+}
+
 //Se realiza el loop que rige todo el sistema
 void loop() {
   //Si se realiza algun cambio en el estado de butCambio, el modo cambia
@@ -119,5 +137,11 @@ void loop() {
     ModoManual();
   } else {
     ModoAutomatico();
+  }
+
+  // Mostrar posiciones periódicamente
+  if (millis() - ultimoReporte >= intervaloReporte) {
+    mostrarPosiciones();
+    ultimoReporte = millis();
   }
 }
